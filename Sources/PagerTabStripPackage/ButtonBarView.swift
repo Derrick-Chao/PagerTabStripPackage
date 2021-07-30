@@ -47,8 +47,7 @@ class ButtonBarView: UICollectionView {
     // MARK:- Layouts
     private func initView() {
      
-        let bundle = Bundle(for: ButtonBarCell.self)
-        let cellNib = UINib(nibName: "ButtonBarCell", bundle: bundle)
+        let cellNib = UINib(nibName: "ButtonBarCell", bundle: .module)
         register(cellNib, forCellWithReuseIdentifier: "ButtonBarCell")
         showsHorizontalScrollIndicator = false
     }
