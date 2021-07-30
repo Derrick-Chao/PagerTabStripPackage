@@ -7,21 +7,74 @@
 
 import UIKit
 
-public struct ButtonBarViewSettings {
-    public static let defaultSetting = ButtonBarViewSettings()
+public class ButtonBarViewSettings {
+    static let minimumHeight: CGFloat = 50.0
+    public init() {}
     
-    public var buttonBarBackgroundColor: UIColor = .white
-    public var barInteritemSpacing: CGFloat = 12.0
-    public var viewHeight: CGFloat = 70.0
-    public var itemTextFont: UIFont = UIFont.systemFont(ofSize: 16.0, weight: .regular)
-    public var itemLeftRightPadding: CGFloat = 20.0
-    public var itemBorderColor: UIColor = .lightGray
-    public var itemUnselectedBackgroundColor: UIColor = .white
-    public var itemSelectedBackgroundColor: UIColor = .black
-    public var itemSelectedTextColor: UIColor = .white
-    public var itemUnselectedTextColor: UIColor = .black
-    public var itemShadowColor: UIColor = .black
-    public var barLeftRightInset: CGFloat = 12.0
+    public var updateSettings: (() -> Void)?
+    public var buttonBarBackgroundColor: UIColor = .white {
+        didSet {
+            updateSettings?()
+        }
+    }
+    public var barInteritemSpacing: CGFloat = 12.0 {
+        didSet {
+            updateSettings?()
+        }
+    }
+    public var viewHeight: CGFloat = 70.0 {
+        didSet {
+            if viewHeight < ButtonBarViewSettings.minimumHeight {
+                viewHeight = ButtonBarViewSettings.minimumHeight
+            }
+            updateSettings?()
+        }
+    }
+    public var itemTextFont: UIFont = UIFont.systemFont(ofSize: 16.0, weight: .regular) {
+        didSet {
+            updateSettings?()
+        }
+    }
+    public var itemLeftRightPadding: CGFloat = 20.0 {
+        didSet {
+            updateSettings?()
+        }
+    }
+    public var itemBorderColor: UIColor = .lightGray {
+        didSet {
+            updateSettings?()
+        }
+    }
+    public var itemUnselectedBackgroundColor: UIColor = .white {
+        didSet {
+            updateSettings?()
+        }
+    }
+    public var itemSelectedBackgroundColor: UIColor = .black {
+        didSet {
+            updateSettings?()
+        }
+    }
+    public var itemSelectedTextColor: UIColor = .white {
+        didSet {
+            updateSettings?()
+        }
+    }
+    public var itemUnselectedTextColor: UIColor = .black {
+        didSet {
+            updateSettings?()
+        }
+    }
+    public var itemShadowColor: UIColor = .black {
+        didSet {
+            updateSettings?()
+        }
+    }
+    public var barLeftRightInset: CGFloat = 12.0 {
+        didSet {
+            updateSettings?()
+        }
+    }
 }
 
 class ButtonBarView: UICollectionView {
@@ -47,7 +100,8 @@ class ButtonBarView: UICollectionView {
     // MARK:- Layouts
     private func initView() {
      
-        let cellNib = UINib(nibName: "ButtonBarCell", bundle: .module)
+        let bundle = Bundle(for: ButtonBarCell.self)
+        let cellNib = UINib(nibName: "ButtonBarCell", bundle: bundle)
         register(cellNib, forCellWithReuseIdentifier: "ButtonBarCell")
         showsHorizontalScrollIndicator = false
     }

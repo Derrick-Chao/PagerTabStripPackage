@@ -26,7 +26,11 @@ open class PagerTabStripViewController: UIViewController {
     open var pageWidth: CGFloat {
         return containerView.bounds.width
     }
-    open var settings: ButtonBarViewSettings = .defaultSetting
+    open var settings: ButtonBarViewSettings = ButtonBarViewSettings() {
+        didSet {
+            updateSettings()
+        }
+    }
     
     public private(set) var viewControllers = [UIViewController]()
     public private(set) var currentIndex = 0
@@ -45,6 +49,7 @@ open class PagerTabStripViewController: UIViewController {
     private var cellWidths: [CGFloat] = []
     private var lastContentOffsetX: CGFloat = 0.0
     private var lastSize: CGSize = .zero
+    private var buttonBarHeightAnchor: NSLayoutConstraint?
     
     // MARK:- Life cycle
     override open func viewDidLoad() {
@@ -66,6 +71,14 @@ open class PagerTabStripViewController: UIViewController {
         ])
         didMove(toParent: self)
         calculateCellWidths()
+        settings.updateSettings = { [weak self] in
+            guard let self = self else { return }
+            self.updateSettings()
+        }
+    }
+    
+    deinit {
+        print("PagerTabStripViewController deinit.")
     }
     
     override open func viewWillAppear(_ animated: Bool) {
@@ -113,12 +126,14 @@ open class PagerTabStripViewController: UIViewController {
         } else {
             topAnchor = view.topAnchor
         }
+        let heightAnchor = buttonBarView.heightAnchor.constraint(equalToConstant: settings.viewHeight)
         NSLayoutConstraint.activate([
             buttonBarView.topAnchor.constraint(equalTo: topAnchor),
             buttonBarView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             buttonBarView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            buttonBarView.heightAnchor.constraint(equalToConstant: settings.viewHeight)
+            heightAnchor
         ])
+        buttonBarHeightAnchor = heightAnchor
     }
     
     private func configureContainerView() {
@@ -273,6 +288,20 @@ open class PagerTabStripViewController: UIViewController {
             return viewControllers.count - 1
         }
         return futurePage
+    }
+    
+    private func updateSettings() {
+        print("updateSettings")
+        let flowLayout = buttonBarView.collectionViewLayout as! UICollectionViewFlowLayout
+        flowLayout.minimumInteritemSpacing = settings.barInteritemSpacing
+        flowLayout.sectionInset = UIEdgeInsets(top: 0.0, left: settings.barLeftRightInset, bottom: 0.0, right: settings.barLeftRightInset)
+        buttonBarView.backgroundColor = settings.buttonBarBackgroundColor
+        calculateCellWidths()
+        buttonBarHeightAnchor?.isActive = false
+        buttonBarHeightAnchor = buttonBarView.heightAnchor.constraint(equalToConstant: settings.viewHeight)
+        buttonBarHeightAnchor?.isActive = true
+        view.layoutIfNeeded()
+        buttonBarView.reloadData()
     }
     
     // MARK:- Actions
